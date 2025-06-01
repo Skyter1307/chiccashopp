@@ -1,41 +1,97 @@
-<?php include 'php/header.php'?>
+<?php
+session_start();
+include 'php/conexao.php';
 
-  <!-- Conteúdo -->
-  <div class="container my-5">
+// Inicializa o carrinho se não existir
+if (!isset($_SESSION['carrinho'])) {
+    $_SESSION['carrinho'] = [];
+}
+
+// Adiciona produto ao carrinho (com validação)
+if (isset($_GET['adicionar'])) {
+    $id_produto = (int) $_GET['adicionar'];
+
+    // Verifica se o produto existe e está ativo
+    $stmt = $conn->prepare("SELECT id FROM produtos WHERE id = ? AND status = 'ativo'");
+    $stmt->bind_param("i", $id_produto);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        if (!isset($_SESSION['carrinho'][$id_produto])) {
+            $_SESSION['carrinho'][$id_produto] = 1;
+        } else {
+            $_SESSION['carrinho'][$id_produto]++;
+        }
+    }
+
+    header('Location: carrinho.php');
+    exit;
+}
+
+// Remove produto do carrinho
+if (isset($_GET['remover'])) {
+    $id_produto = (int) $_GET['remover'];
+
+    if (isset($_SESSION['carrinho'][$id_produto])) {
+        unset($_SESSION['carrinho'][$id_produto]);
+    }
+
+    header('Location: carrinho.php');
+    exit;
+}
+?>
+
+<?php include 'php/header.php'; ?>
+
+<div class="container my-5">
     <h2 class="mb-4">Seu Carrinho</h2>
-    <div class="table-responsive">
-      <table class="table align-middle">
-        <thead class="table-dark">
-          <tr>
-            <th>Produto</th>
-            <th>Preço</th>
-            <th>Qtd</th>
-            <th>Total</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="carrinho-itens">
-          <!-- Conteúdo gerado por JS futuramente -->
-          <tr>
-            <td>Lingerie Sensual</td>
-            <td>R$ 89,90</td>
-            <td>1</td>
-            <td>R$ 89,90</td>
-            <td><button class="btn btn-sm btn-danger">Remover</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="text-end">
-      <h4>Total: R$ 89,90</h4>
-      <a href="#" class="btn btn-success">Finalizar Compra</a>
-    </div>
-  </div>
 
-  <footer class="bg-dark text-light text-center py-3">
-    <p class="mb-0">&copy; 2025 ChiccaShop</p>
-  </footer>
+    <?php if (empty($_SESSION['carrinho'])): ?>
+        <p>Seu carrinho está vazio.</p>
+    <?php else: ?>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unitário</th>
+                    <th>Total</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $totalGeral = 0;
+                foreach ($_SESSION['carrinho'] as $id => $qtd):
+                    $stmt = $conn->prepare("SELECT nome, preco FROM produtos WHERE id = ?");
+                    $stmt->bind_param("i", $id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $produto = $result->fetch_assoc();
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+                    $subtotal = $produto['preco'] * $qtd;
+                    $totalGeral += $subtotal;
+                ?>
+                <tr>
+                    <td><?= htmlspecialchars($produto['nome']) ?></td>
+                    <td><?= $qtd ?></td>
+                    <td>R$ <?= number_format($produto['preco'], 2, ',', '.') ?></td>
+                    <td>R$ <?= number_format($subtotal, 2, ',', '.') ?></td>
+                    <td><a href="?remover=<?= $id ?>" class="btn btn-sm btn-danger">Remover</a></td>
+                </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td colspan="3" class="text-end fw-bold">Total Geral</td>
+                    <td colspan="2" class="fw-bold">R$ <?= number_format($totalGeral, 2, ',', '.') ?></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-between">
+            <a href="produtos.php" class="btn btn-danger">Continuar Comprando</a>
+            <a href="finalizar.php" class="btn btn-success">Finalizar Compra</a>
+        </div>
+    <?php endif; ?>
+</div>
+
+<?php include 'php/footer.php'; ?>
