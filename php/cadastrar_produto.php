@@ -10,24 +10,71 @@ include 'conexao.php';
 $nome = $_POST['nome'] ?? '';
 $descricao = $_POST['descricao'] ?? '';
 $categoria = $_POST['categoria'] ?? '';
-$preco = $_POST['preco'] ?? '';
+$preco = str_replace(',', '.', $_POST['preco'] ?? '');
+$tamanho = $_POST['tamanho'] ?? '';
 $quantidade = isset($_POST['quantidade']) ? intval($_POST['quantidade']) : 1;
 $status = $_POST['status'] ?? 'ativo';
 
-// Se a quantidade for 0, o produto será inativo
+$tamanhos_validos = ['P', 'M', 'G', 'GG', 'G1', 'G2', 'G3'];
+if (!in_array($tamanho, $tamanhos_validos)) {
+    echo "Tamanho inválido. Os tamanhos permitidos são: P, M, G, GG, G1, G2, G3.";
+    exit;
+}
+
 if ($quantidade <= 0) {
     $status = 'inativo';
 }
 
-function criarThumb($origem, $destino, $largura = 300, $altura = 300) {
+function redimensionarEConverterWebp($origem_tmp, $destino, $largura = 800, $altura = 800)
+{
+    list($largura_original, $altura_original, $tipo) = getimagesize($origem_tmp);
+
+    switch ($tipo) {
+        case IMAGETYPE_JPEG:
+            $imagem = imagecreatefromjpeg($origem_tmp);
+            break;
+        case IMAGETYPE_PNG:
+            $imagem = imagecreatefrompng($origem_tmp);
+            break;
+        case IMAGETYPE_GIF:
+            $imagem = imagecreatefromgif($origem_tmp);
+            break;
+        case IMAGETYPE_WEBP:
+            $imagem = imagecreatefromwebp($origem_tmp);
+            break;
+        default:
+            return false;
+    }
+
+    $thumb = imagecreatetruecolor($largura, $altura);
+    imagecopyresampled($thumb, $imagem, 0, 0, 0, 0, $largura, $altura, $largura_original, $altura_original);
+
+    $resultado = imagewebp($thumb, $destino, 85);
+
+    imagedestroy($imagem);
+    imagedestroy($thumb);
+    return $resultado;
+}
+
+function criarThumb($origem, $destino, $largura = 300, $altura = 300)
+{
     list($largura_original, $altura_original, $tipo) = getimagesize($origem);
 
     switch ($tipo) {
-        case IMAGETYPE_JPEG: $imagem = imagecreatefromjpeg($origem); break;
-        case IMAGETYPE_PNG: $imagem = imagecreatefrompng($origem); break;
-        case IMAGETYPE_GIF: $imagem = imagecreatefromgif($origem); break;
-        case IMAGETYPE_WEBP: $imagem = imagecreatefromwebp($origem); break;
-        default: return false;
+        case IMAGETYPE_JPEG:
+            $imagem = imagecreatefromjpeg($origem);
+            break;
+        case IMAGETYPE_PNG:
+            $imagem = imagecreatefrompng($origem);
+            break;
+        case IMAGETYPE_GIF:
+            $imagem = imagecreatefromgif($origem);
+            break;
+        case IMAGETYPE_WEBP:
+            $imagem = imagecreatefromwebp($origem);
+            break;
+        default:
+            return false;
     }
 
     $thumb = imagecreatetruecolor($largura, $altura);
@@ -39,40 +86,35 @@ function criarThumb($origem, $destino, $largura = 300, $altura = 300) {
 
     imagecopyresampled($thumb, $imagem, 0, 0, $x, $y, $largura, $altura, $novo_largura, $novo_altura);
 
-    switch ($tipo) {
-        case IMAGETYPE_JPEG: imagejpeg($thumb, $destino, 85); break;
-        case IMAGETYPE_PNG: imagepng($thumb, $destino); break;
-        case IMAGETYPE_GIF: imagegif($thumb, $destino); break;
-        case IMAGETYPE_WEBP: imagewebp($thumb, $destino); break;
-    }
+    $resultado = imagewebp($thumb, $destino, 85);
 
     imagedestroy($imagem);
     imagedestroy($thumb);
-    return true;
+    return $resultado;
 }
 
 if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
     $imagem = $_FILES['imagem'];
     $extensao = strtolower(pathinfo($imagem['name'], PATHINFO_EXTENSION));
 
-    $extensoes_permitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    $extensoes_permitidas = ['jpg', 'jpeg', 'jfif', 'png', 'gif', 'webp'];
     if (!in_array($extensao, $extensoes_permitidas)) {
         echo "Formato de imagem não permitido. Use jpg, jpeg, png, gif ou webp.";
         exit;
     }
 
-    $nomeImagem = uniqid() . '.' . $extensao;
-    $caminhoOriginal = dirname(__DIR__) . '/imagens/' . $nomeImagem;
-    $caminhoThumb = dirname(__DIR__) . '/imagens/thumbs/' . $nomeImagem;
+    $nomeImagem = uniqid() . '.webp';
+    $caminhoOriginal = dirname(__DIR__) . '/assets/imagens/' . $nomeImagem;
+    $caminhoThumb = dirname(__DIR__) . '/assets/imagens/thumbs/' . $nomeImagem;
 
-    if (move_uploaded_file($imagem['tmp_name'], $caminhoOriginal)) {
+    if (redimensionarEConverterWebp($imagem['tmp_name'], $caminhoOriginal)) {
         if (!criarThumb($caminhoOriginal, $caminhoThumb)) {
             echo "Erro ao criar a miniatura da imagem.";
             exit;
         }
 
-        $stmt = $conn->prepare("INSERT INTO produtos (nome, descricao, categoria, preco, imagem, status, quantidade) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssssi", $nome, $descricao, $categoria, $preco, $nomeImagem, $status, $quantidade);
+        $stmt = $conn->prepare("INSERT INTO produtos (nome, descricao, categoria, preco, imagem, status, quantidade, tamanho) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssssis", $nome, $descricao, $categoria, $preco, $nomeImagem, $status, $quantidade, $tamanho);
 
         if ($stmt->execute()) {
             echo "<script>alert('Produto cadastrado com sucesso!'); window.location.href='../painel_admin.php';</script>";
@@ -82,11 +124,10 @@ if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
 
         $stmt->close();
     } else {
-        echo "Erro ao salvar a imagem original.";
+        echo "Erro ao processar a imagem original.";
     }
 } else {
     echo "Imagem do produto é obrigatória.";
 }
 
 $conn->close();
-?>

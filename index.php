@@ -34,7 +34,7 @@ $result = $conn->query($sql);
               <div class="card-body">
                 <h5 class="card-title"><?= htmlspecialchars($produto['nome']) ?></h5>
                 <p class="card-text">R$ <?= number_format($produto['preco'], 2, ',', '.') ?></p>
-                <a href="produto.html?id=<?= $produto['id'] ?>" class="btn btn-dark w-100">Ver Produto</a>
+                <a href="produto.php?id=<?= $produto['id'] ?>" class="btn btn-dark w-100">Ver Produto</a>
               </div>
             </div>
           </div>

@@ -1,25 +1,35 @@
 <?php
 session_start();
+include 'conexao.php';
 
-$id = $_GET['id'] ?? null;
+$id_produto = intval($_POST['id_produto']);
+$tamanho = $_POST['tamanho'];
+$quantidade = intval($_POST['quantidade']);
 
-if (!$id) {
-    header("Location: ../produtos.php");
+// Verifica estoque
+$sql = "SELECT nome, quantidade FROM produtos WHERE id = $id_produto";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    $produto = $result->fetch_assoc();
+
+    if ($quantidade > $produto['quantidade']) {
+        // Estoque insuficiente
+        $_SESSION['erro_estoque'] = "Estoque insuficiente! Apenas {$produto['quantidade']} unidade(s) disponível(is).";
+        header("Location: ../produto.php?id=$id_produto");
+        exit;
+    }
+
+    // Adiciona ao carrinho (exemplo básico usando sessão)
+    $_SESSION['carrinho'][] = [
+        'id' => $id_produto,
+        'tamanho' => $tamanho,
+        'quantidade' => $quantidade
+    ];
+
+    header("Location: ../carrinho.php");
     exit;
-}
-
-// Inicializa o carrinho se ainda não existir
-if (!isset($_SESSION['carrinho'])) {
-    $_SESSION['carrinho'] = [];
-}
-
-// Se o produto já estiver no carrinho, aumenta a quantidade
-if (isset($_SESSION['carrinho'][$id])) {
-    $_SESSION['carrinho'][$id]++;
 } else {
-    $_SESSION['carrinho'][$id] = 1;
+    echo "Produto não encontrado.";
 }
-
-header("Location: ../carrinho.php");
-exit;
 ?>

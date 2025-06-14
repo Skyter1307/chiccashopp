@@ -22,7 +22,13 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="index.php">Início</a></li>
-        <li class="nav-item"><a class="nav-link" href="produtos.php">Produtos</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Produtos</a>
+        <ul class="dropdown-menu">
+          <li><a href="./produtos.php" class="dropdown-item">Todos</a></li>
+          <li><a href="#" class="dropdown-item">Teste</a></li>
+        </ul>
+        </li>
         <li class="nav-item"><a class="nav-link" href="login.php">Login</a></li>
         <li class="nav-item"><a class="nav-link" href="carrinho.php">Carrinho</a></li>
       </ul>
