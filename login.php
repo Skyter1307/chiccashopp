@@ -1,5 +1,8 @@
 <?php
-session_start();
+if(!isset($_SESSION)){
+    session_start();
+}
+
 if (isset($_SESSION['admin']) && $_SESSION['admin'] === true) {
     header('Location: painel_admin.php');
     exit();
