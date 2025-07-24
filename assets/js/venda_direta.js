@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const container = document.querySelector(".card-body");
     const salvarBtn = document.getElementById("salvarVenda");
     const formaPagamento = document.getElementById("forma_pagamento");
-
     const parcelasWrapper = document.getElementById("parcelasWrapper");
 
     // HTML fixo para valor pago e troco
@@ -23,11 +22,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     formaPagamento.addEventListener("change", function () {
         parcelasWrapper.innerHTML = valorPagoHTML;
-
-        if (this.value === "À prazo") {
+        if (this.value === "prazo") {
             parcelasWrapper.innerHTML += campoParcelas;
         }
-
         atualizarTotais();
     });
 
@@ -43,7 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     <table class="table table-bordered text-center">
                         <thead><tr><th>Parcela</th><th>Data</th><th>Valor</th></tr></thead><tbody>
                 `;
-
                 for (let i = 1; i <= qtd; i++) {
                     html += `
                         <tr>
@@ -52,7 +48,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td><input type="number" step="0.01" class="form-control parcelaValor" name="valor_parcela_${i}"></td>
                         </tr>`;
                 }
-
                 html += "</tbody></table>";
                 tabela.innerHTML = html;
             } else {
@@ -116,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const tipo = formaPagamento.value;
-        const valorBase = (tipo === "À prazo") ? valorParcelas : valorPago;
+        const valorBase = (tipo === "prazo") ? valorParcelas : valorPago;
         const troco = valorBase - total;
 
         if (trocoEl) {
@@ -127,52 +122,166 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Modal cliente
-    document.getElementById("btnSalvarCliente").addEventListener("click", () => {
-    const nome = document.getElementById("novoNome").value.trim();
-    const tel = document.getElementById("novoTelefone").value.trim();
-    const nasc = document.getElementById("novoNascimento").value;
+    document.getElementById("salvarNovoCliente").addEventListener("click", () => {
+        const nome = document.getElementById("novo_nome").value.trim();
+        const tel = document.getElementById("novo_telefone").value.trim();
+        const nasc = document.getElementById("novo_nascimento").value;
 
-    if (!nome || !tel || !nasc) return alert("Preencha todos os campos.");
+        if (!nome || !tel || !nasc) return alert("Preencha todos os campos.");
 
-    // Envia para o backend
-    fetch('php/salvar_cliente.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ nome, telefone: tel, nascimento: nasc })
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.status === 'sucesso') {
-            // Adiciona ao select
-            const select = document.getElementById("cliente");
-            const opt = document.createElement("option");
-            opt.value = nome;
-            opt.text = nome;
-            opt.selected = true;
-            select.appendChild(opt);
+        fetch('php/salvar_cliente_venda_direta.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ nome, telefone: tel, nascimento: nasc })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                const select = document.getElementById("cliente");
+                const opt = document.createElement("option");
+                opt.value = res.id;
+                opt.text = nome;
+                opt.selected = true;
+                select.appendChild(opt);
 
-            const modal = bootstrap.Modal.getInstance(document.getElementById('modalNovoCliente'));
-            modal.hide();
+                bootstrap.Modal.getInstance(document.getElementById('modalNovoCliente')).hide();
 
-            document.getElementById("novoNome").value = "";
-            document.getElementById("novoTelefone").value = "";
-            document.getElementById("novoNascimento").value = "";
+                document.getElementById("novo_nome").value = "";
+                document.getElementById("novo_telefone").value = "";
+                document.getElementById("novo_nascimento").value = "";
 
-            alert("Cliente salvo com sucesso!");
-        } else {
-            alert("Erro: " + res.mensagem);
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Erro ao tentar salvar o cliente.");
+                alert("Cliente salvo com sucesso!");
+            } else {
+                alert("Erro ao salvar cliente.");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro ao tentar salvar o cliente.");
+        });
     });
-});
-
 
     // Corrige fundo escuro ao fechar modal
     document.addEventListener('hidden.bs.modal', function () {
         document.body.classList.remove('modal-open');
         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    });
+
+    document.getElementById("salvarVenda").addEventListener("click", function () {
+    const clienteId = document.getElementById("cliente").value;
+    const dataVenda = document.getElementById("data_venda").value;
+    const formaPagamento = document.getElementById("forma_pagamento").value;
+    const observacoes = document.getElementById("observacoes").value.trim();
+
+    // Total da venda (pegando do campo total já calculado na tela)
+    const totalTexto = document.getElementById("totalVenda").textContent.replace("R$ ", "").replace(",", ".");
+    const valorTotal = parseFloat(totalTexto) || 0;
+
+    // Parcelas (se for à prazo)
+    let numParcelas = 0;
+    let listaDeParcelas = [];
+
+    if (formaPagamento === "prazo") {
+        numParcelas = parseInt(document.getElementById("numParcelas").value) || 0;
+
+        for (let i = 1; i <= numParcelas; i++) {
+            const campoData = document.querySelector(`input[name="data_parcela_${i}"]`);
+            const campoValor = document.querySelector(`input[name="valor_parcela_${i}"]`);
+
+            if (campoData && campoValor) {
+                const data = campoData.value;
+                const valor = parseFloat(campoValor.value) || 0;
+
+                if (data && valor > 0) {
+                    listaDeParcelas.push({ data, valor });
+                }
+            }
+        }
+    }
+
+    // Validação mínima
+    if (!clienteId || clienteId === "Selecionar cliente" || !dataVenda || !formaPagamento || valorTotal <= 0) {
+        alert("Preencha todos os campos obrigatórios e adicione pelo menos um produto.");
+        return;
+    }
+
+    // Montar os dados a serem enviados
+    const dados = new URLSearchParams();
+    dados.append("cliente_id", clienteId);
+    dados.append("data_venda", dataVenda);
+    dados.append("valor_total", valorTotal.toFixed(2));
+    dados.append("forma_pagamento", formaPagamento);
+    dados.append("parcelas", numParcelas);
+    dados.append("observacoes", observacoes);
+    dados.append("dados_parcelas", JSON.stringify(listaDeParcelas)); // muito importante enviar como JSON
+
+    // Enviar via fetch
+    fetch("php/salvar_venda_direta.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: dados
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.success) {
+            alert("Venda salva com sucesso!");
+            location.reload(); // ou redirecionar para outra página, se quiser
+        } else {
+            alert("Erro ao salvar venda: " + res.mensagem);
+        }
+    })
+    .catch(erro => {
+        console.error("Erro na requisição:", erro);
+        alert("Erro inesperado ao tentar salvar a venda.");
+    });
+});
+
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const modalPagamento = new bootstrap.Modal(document.getElementById('modalPagamento'));
+
+    // Abrir modal
+    document.querySelectorAll(".marcar-pago").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const id = btn.dataset.id;
+            document.getElementById("id_parcela_pagamento").value = id;
+            document.getElementById("data_pagamento").value = ""; // limpa o campo
+            modalPagamento.show();
+        });
+    });
+
+    // Submeter pagamento
+    document.getElementById("formPagamento").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const id = document.getElementById("id_parcela_pagamento").value;
+        const data = document.getElementById("data_pagamento").value;
+
+        if (!data) {
+            alert("Informe a data do pagamento.");
+            return;
+        }
+
+        fetch("php/registrar_pagamento_parcela.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ id_parcela: id, data_pagamento: data })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                alert("Pagamento registrado com sucesso!");
+                location.reload();
+            } else {
+                alert("Erro ao registrar pagamento: " + res.mensagem);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Erro inesperado ao registrar o pagamento.");
+        });
     });
 });

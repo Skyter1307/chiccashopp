@@ -1,0 +1,246 @@
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carol
+    [telefone] => (21) 99011-7513
+    [nascimento] => 1999-05-12
+)
+Array
+(
+    [nome] => Carolina Alvarenga
+    [telefone] => 21999049188
+    [nascimento] => 1995-11-10
+)
+Array
+(
+    [nome] => Sandra Vitoriano
+    [telefone] => 21992476682
+    [nascimento] => 1967-01-13
+)
+Array
+(
+    [nome] => Alice Nascimento
+    [telefone] => 21969339519
+    [nascimento] => 1997-03-12
+)
+Array
+(
+    [nome] => wevilly
+    [telefone] => 21993772430
+    [nascimento] => 1973-10-08
+)
+Array
+(
+    [nome] => Renata Nunes
+    [telefone] => 21994162367
+    [nascimento] => 1974-06-07
+)
+Array
+(
+    [nome] => sofia
+    [telefone] => 21983736503
+    [nascimento] => 2011-10-25
+)
+Array
+(
+    [nome] => crislaine
+    [telefone] => 21971377949
+    [nascimento] => 1996-09-04
+)
+Array
+(
+    [nome] => bernadete
+    [telefone] => 21984103315
+    [nascimento] => 1961-12-15
+)
+Array
+(
+    [nome] => raquel rosa
+    [telefone] => 21996032234
+    [nascimento] => 1983-06-27
+)
+Array
+(
+    [nome] => camile max
+    [telefone] => 11917532111
+    [nascimento] => 1993-03-04
+)
+Array
+(
+    [nome] => yasmin sofia
+    [telefone] => 2100000000
+    [nascimento] => 2010-02-03
+)
+Array
+(
+    [nome] => Lucimar Martins
+    [telefone] => 21997373621
+    [nascimento] => 1991-03-19
+)
+Array
+(
+    [nome] => Alba Marques
+    [telefone] => 21964651284
+    [nascimento] => 1989-11-18
+)
+Array
+(
+    [nome] => loira
+    [telefone] => 21964513319
+    [nascimento] => 1985-04-19
+)
+Array
+(
+    [nome] => Angelica Jeremias
+    [telefone] => 21973568032
+    [nascimento] => 1987-05-07
+)
+Array
+(
+    [nome] => Carolina Rocha
+    [telefone] => 21976658050
+    [nascimento] => 1995-09-14
+)
+Array
+(
+    [nome] => Jaqueline Siqueira Lima
+    [telefone] => 21985893019
+    [nascimento] => 1987-04-15
+)
+Array
+(
+    [nome] => Jocelia Vitoria da Silva
+    [telefone] => 21998384622
+    [nascimento] => 1961-05-16
+)
+Array
+(
+    [nome] => Claudia Alves
+    [telefone] => 21980225546
+    [nascimento] => 1976-10-24
+)
+Array
+(
+    [nome] => Gabi Alves
+    [telefone] => 21981402365
+    [nascimento] => 2014-02-25
+)
+Array
+(
+    [nome] => Marlene Barbosa
+    [telefone] => 21979571164
+    [nascimento] => 1969-04-15
+)
+Array
+(
+    [nome] => Loja Brinde ou Custo
+    [telefone] => 21996444768
+    [nascimento] => 1988-07-13
+)
+Array
+(
+    [nome] => patricia mireles
+    [telefone] => 21970297973
+    [nascimento] => 1987-11-18
+)
+Array
+(
+    [nome] => Alessandra Racoare
+    [telefone] => 21998097018
+    [nascimento] => 1988-09-12
+)
+Array
+(
+    [nome] => Emanuela Marins
+    [telefone] => 21971742026
+    [nascimento] => 1989-03-23
+)
+Array
+(
+    [nome] => Jecira Jeremias
+    [telefone] => 21999629310
+    [nascimento] => 1952-01-14
+)
+Array
+(
+    [nome] => MARIA APARECIDA
+    [telefone] => 21989415452
+    [nascimento] => 1973-07-15
+)
+Array
+(
+    [nome] => CRISTIANE
+    [telefone] => 21970255413
+    [nascimento] => 1972-04-20
+)
+Array
+(
+    [nome] => Maria Sofia
+    [telefone] => 21982154594
+    [nascimento] => 2013-08-25
+)
+Array
+(
+    [nome] => Ana Carolina Passos de Oliveira
+    [telefone] => 21964353167
+    [nascimento] => 1992-05-14
+)
+Array
+(
+    [nome] => katia regina
+    [telefone] => 21995093173
+    [nascimento] => 1975-11-25
+)
+Array
+(
+    [nome] => adriana batalha
+    [telefone] => 21980894305
+    [nascimento] => 1970-02-13
+)

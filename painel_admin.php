@@ -63,12 +63,12 @@ if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
         </div>
 
         <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Pedidos</div>
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Relatórios</div>
                 <div class="card-body">
-                    <h5 class="card-title">Visualizar Pedidos</h5>
-                    <p class="card-text">Acompanhar os pedidos feitos pelos clientes.</p>
-                    <a href="admin_pedidos.php" class="btn btn-light">Acessar</a>
+                    <h5 class="card-title">Relatório de vendas e débitos</h5>
+                    <p class="card-text">Vendas gerais e valores em aberto.</p>
+                    <a href="escolha_relatorio.php" class="btn btn-light">Acessar</a>
                 </div>
             </div>
         </div>
